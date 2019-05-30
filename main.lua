@@ -5,30 +5,20 @@
 -----------------------------------------------------------------------------------------
 
 
---variables
-local left = 0-(display.actualContentWidth - display.contentWidth)/2
-local top = 0-(display.actualContentHeight - display.contentHeight)/2
-local right = display.contentWidth + (display.actualContentWidth - display.contentWidth)/2
+-- variables
 local bottom = display.contentHeight + (display.actualContentHeight - display.contentHeight)/2
-
 local endText = "Game over!"
-
 local ballsGroup = display.newGroup()
 local gradient
 
-math.randomseed( os.time() )
+math.randomseed(os.time())
 
 -- display
+display.setStatusBar(display.HiddenStatusBar)
+
 local background = display.newImageRect("background.png", 360, 570)
 background.x = display.contentCenterX
 background.y = display.contentCenterY
-
-local ball = display.newCircle(112, 112, 50)
-gradient = {
-    type="gradient",
-    color1={ 1, 0.2, 0.1 }, color2={ 0.7, 0.8, 0.3 }, direction="down"
-}
-ball:setFillColor(gradient)
 
 local endText = display.newText("", display.contentCenterX, 20, native.systemFont, 40 )
 endText:setFillColor(0, 0, 0)
@@ -38,16 +28,17 @@ endText:setFillColor(0, 0, 0)
 local physics = require("physics")
 physics.start()
 physics.setGravity(0, 9)
-physics.addBody(ball, {radius=50})
 
 
--- interaction
-local function pushBall()
-    ball:applyTorque(10)
-    ball:applyLinearImpulse( 0, -0.75, ball.x, ball.y )
+-- functions
+local function createBall()
+
 end
 
-ball:addEventListener( "tap", pushBall )
+local function pushBall()
+    ball:applyTorque(math.random(-100, 100))
+    ball:applyLinearImpulse( 0, -0.75, ball.x, ball.y )
+end
 
 local function isAtBottom( self, event )
    buffer = self.y/2
@@ -55,6 +46,17 @@ local function isAtBottom( self, event )
         endText.text = endText
    end
 end
-
+local ball = display.newCircle(180, 0, 50)
+gradient = {
+    type="gradient",
+    color1={math.random(), math.random(), math.random()},
+    color2={math.random(), math.random(), math.random()},
+    direction="down"
+    }
+ball:setFillColor(gradient)
+ball:addEventListener("tap", pushBall)
+--ball:applyTorque(math.random(-100, 100))
+--table.insert(ballsGroup, ball)
+physics.addBody(ball, {radius=50})
 ball.enterFrame = isAtBottom
-Runtime:addEventListener( "enterFrame", ball )
+Runtime:addEventListener("enterFrame", ball)
